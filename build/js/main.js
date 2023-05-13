@@ -95,3 +95,29 @@ var Grade;
     Grade[Grade["A"] = 5] = "A";
 })(Grade || (Grade = {}));
 console.log(Grade.U);
+function multiplicationTable(size) {
+    let multArr = [];
+    for (let i = 0; i < size; i++) {
+        multArr.push([]);
+        for (let j = 0; j < size; j++) {
+            multArr[i].push((i + 1) * (j + 1));
+        }
+    }
+    return multArr;
+}
+console.log(multiplicationTable(1));
+console.log(multiplicationTable(2));
+console.log(multiplicationTable(3));
+let commaSplit = /[\w\s\.]*[^,]/g;
+let streetNumRegEx = /^\d+/;
+let testStr = "54 Holy Grail Street Niagara Town ZP 32908,3200 Main Rd. Bern AE 56210,1 Gordon St. Atlanta RE 13000";
+let matchArr;
+if (testStr.match(commaSplit) != null) {
+    matchArr = testStr.match(commaSplit);
+    console.log(matchArr);
+    console.log(streetNumRegEx.test(matchArr[1]));
+    console.log(matchArr[1].match(streetNumRegEx)[0]);
+    console.log(matchArr ? matchArr.map((x) => x.match(streetNumRegEx)[0]) : console.log("failed match"));
+}
+else {
+}

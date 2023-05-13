@@ -147,3 +147,36 @@ enum Grade {
 }
 
 console.log(Grade.U);
+
+function multiplicationTable (size: number): number[][] {
+    let multArr:number[][] = [];
+    for (let i = 0; i < size; i++) {
+        multArr.push([]);
+        for (let j = 0; j < size; j++) {
+            multArr[i].push((i + 1) * (j + 1));
+        }
+    }
+    return multArr;
+}
+
+console.log(multiplicationTable(1));
+console.log(multiplicationTable(2));
+console.log(multiplicationTable(3));
+
+let commaSplit:RegExp = /[\w\s\.]*[^,]/g;
+let streetNumRegEx:RegExp = /^\d+/;
+
+let testStr: string = "54 Holy Grail Street Niagara Town ZP 32908,3200 Main Rd. Bern AE 56210,1 Gordon St. Atlanta RE 13000"
+let matchArr: (RegExpMatchArray);
+if(testStr.match(commaSplit)!=null){
+    matchArr = testStr.match(commaSplit);
+    console.log(matchArr);
+    console.log(streetNumRegEx.test(matchArr[1]));
+    console.log(matchArr[1].match(streetNumRegEx)[0]);
+    console.log(matchArr?matchArr.map((x: string) => x.match(streetNumRegEx)[0]):console.log("failed match"));
+
+}else{
+
+}
+
+
