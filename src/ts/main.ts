@@ -1,182 +1,110 @@
-let stringArr = ["one","hey","Dave"];
-let guitars = ["Strat", "Les Paul", 5150];
-let mixedData = ["EVH", 1952, true];
+//Type Aliases
+//Can apply to more than just objects
 
-stringArr[0] = "Jeff";
-//stringArr.push(21); //Typescrpit does't like; however, it doesn't put a limit on the amount of data we have in an array
-stringArr.push("Hola");
-
-guitars[0] = 1116; //Due to union type (string | number) Typescript is fine with this
-guitars.unshift("Donald"); //fine with adding string to beginning cause of earlier comment
-
-//stringArr = guitars; //cannot assign an array with both string and number into string only array
-guitars = stringArr; //Can assign just a string array into an array of union type (string | number)
-
-//guitars = mixedData; //Again not allowed cause guitars is only an array of union type (string | number) while mixedData is an array of union type: (string | number | boolean)
-
-let test = []; //Empty array is assigned as an "any" type array by Typescript cause there are no values for Typescript to infer off of
-let bands: string[] = []; //Empty array can be a specific type as long as the type desired is explicitly stated when array is first declared
-bands.push("Beatles"); //Works fine
-
-/*
-  Tuple:
-    If you want to declare an array and explicitly state how long it will be and 
-    what types will be at what positions, you want to create a tuple.
-*/
-let myTuple: [string, number, boolean] = ["evanmico", 19, true]; //only allows explicitly stated data types in explicitly statedd locations
-let mixed = ["Jeff", 2, false]; //Just an array that has union type of (string | number | boolean), not a tuple (can be seen by mousing over)
-
-//mixed = myTuple; // this works fine cause mixed has union type (string | number | boolean) that allows all the values in the tuple to be in the array
-//myTuple = mixed; //Doesn't work because it's possible for mixed to have less than 3 elements; however, the tuple REQUIRES 3 elements so it cannot be assigned
-//myTuple[3] = 19; //Doesn't work since the tuple doesn't have a "4th" position, it only has 3 or indexes 0-2
-myTuple[1] = 21; // Works fine because the tuple does indeed have a number type specified to the second position
-
-//Objects
-let myObj: object; // The easiest way to declare an object, but needs to be done with caution
-myObj = []; // An array is also a type of an object in JS so Typescript is fine with this assignment
-console.log(typeof(myObj)); // Still has an object type, despite now having an array in it
-myObj = bands; //Perfectly Fine, still an object
-myObj = {}; // Perfectly Fine, still an object
-
-//TypeScript has inferred specific types for each prop based on the assignment (hover over to see)
-const exampleObj = {
-    prop1: "evanmico",
-    prop2: true
-}
-
-//exampleObj.prop2 = 19; //Doesn't work because we already have boolean type data due to earlier declaration
-//exampleObj.prop1 = 22; //Doesn't work because it is limited to (number) type
-
-type Guitarist = {
-    name: string,
-    active: boolean,
-    albums: (string | number)[]
-} //This has created a new type with specification "Guitarist"
-
-let evh: Guitarist = {
-    name: "Don",
-    active: false, //If you are using a type that you specified, you must have all of the properties specified when declaring a new object. So you cannot just delete a property as then you will only have 2 properties in a Guitarist type, despite it requiring 3
-    albums: [2121, "OB83C"]
-} //Now when we declare an object of type "Guitarist", we can only provide the data in the appropriate types specified earlier in the new type declaration
-
-let abraham: Guitarist = {
-    name: "Abraham Lincoln",
-    active: false,
-    albums: ["emancipation proclamation", 1887]
-}
-
-//evh = abraham; // Perfectly fine because both are of type Guitarist
-//evh.years = 15;//won't work because years property is not a part of the defined "Guitarist" type
-
-type Pianist = {
-    name: string,
-    active?: boolean, //Due to the ? active is now an optional property. It basically has a union type of (boolean | undefined) cause if it exists, it must be boolean, but it may also be undefined and therefore not exist
-    albums: (string | number)[]
-}
-
-let han: Pianist = {
-    name: "Han Solo",
-    albums: ["Empire Strikes back", 4, "IV"]
-}//Can be declared with only 2 properties cause active property is optional
-
-let leia: Pianist = {
-    name: "Princess Padame",
-    active: true,
-    albums: ["rich", "queen", "basic", 21]
-}
-
-//han = leia; //Still perfectly fine, despite han not having an active property, because they are both of type "Pianist"
-
-/*
-    Each individual property can also be specified for a function and only be assigned a name to be used inside of the function like below:
-*/
-//const greetPianist = (pianist: {name: string, active?: boolean, albums: (string | boolean)}) => (`Hello ${pianist.name}!`); 
-//However, if a type is already specified, then this makes more sense:
-const greetPianist = (pianist: Pianist) => (`Hello ${pianist.name}!`);
-console.log(greetPianist(leia));
-
-
-/*
-    Interface:
-        At the current moment, an interface is essentially the same thing as type.
-        They will have differences down the road, but atm they do the same thing as a type.
-        Right now it is preferance based whether to use an interface or a type.
-        Usually they may be used when having methods in a class [OOP]
-*/
-
-interface TriangePlayer {
+type stringOrNumber = string | number;
+type stringOrNumberArr = (string | number)[];
+type TriangePlayer = {
     name?: string,
     active: boolean,
-    albums: (string | number)[]
+    albums: stringOrNumberArr
 }
 
-let steve: TriangePlayer = {
-    name: "Minecraft Steve",
-    active: true,
-    albums: ["minecraft", "C13", "1"]
+type userId = stringOrNumber; //type userId is now a stringOrNumberType which defines that (string | number) can be held
+
+//this doesn't work because interfaces don't work the same as types,
+//interfaces should really be thought of just objects or classes
+//while types can store anything:
+//interface PostId = stringOrNumber
+
+// Literal Types
+let myName: 'Ivan'; //Variable can ONLY be equaled to 'Ivan'
+
+let userName: 'Ivan' | 'Flavio' | 'Max'; //More useful usage that only allows userName to be equaled to the specified things
+userName = 'Ivan'; //Intelisence shows certain names
+
+// functions
+const add = (a: number, b: number): number =>{
+    return a + b;
+}
+//function that doesn't have return at all should be void
+const logMsg = (message: any): void =>{
+    console.log(message);
 }
 
-let nameless: TriangePlayer = {
-    active: false,
-    albums: ["Ruh Roh", 0.0]
-}
-/*
-    Because name property in interface TrianglePlayer is optional, when calling a function upon it, you must specify that calling a function is optional
-    This is because you cannot call a function on an "undefined" value in JS
-*/
-//const greetTrianglePlayer = (trianglePlayer: TriangePlayer) => (`Hello ${trianglePlayer.name?.toUpperCase}!`); //This is one way to make it optional (the question mark before the .); however, narrowing is preferred (if statement to check)
-const greetTrianglePlayer = (trianglePlayer: TriangePlayer) => (trianglePlayer.name?`Hello ${trianglePlayer.name.toUpperCase()}!`:"Triangle Player Is Unnamed"); // Better solution using narrowing
+logMsg('Hello!');
+logMsg(add(2,3));
+//logMsg(add('a', 3));//doesn't work because we specified our add function to be numbers
 
-console.log(greetTrianglePlayer(steve)); // Returns Hello and name
-console.log(greetTrianglePlayer(nameless)); // Returns else condition
-
-/*
-    Enums (Enumeration):
-        "Unlike most TypeScript features, Enums are 
-        not a type-level addition to JavaScript, but something 
-        added to the language at runtime"
-        Basically, they don't natively exist in JS.
-*/
-
-enum Grade {
-    U = 1, //By default U has index 0, but by specifying an index with "= x" it changes not just the starting value, but all the following values as well to each be 1 higher than the last
-    D,
-    C,
-    B,
-    A
+//standard function works the same as arrow function
+let subtract = function(c: number, d: number): number{
+    return c-d;
 }
 
-console.log(Grade.U);
+// If you make many functions that take the same input parameter types and return the same type, then an alias is useful since it saves typing out :number every time.
+type mathFunction = (a: number, b: number) => number
+/* Interfaces can be used to do the same thing here, but usually you use types with function definitions
+interface mathFunction {
+    (a: number, b: number) : number
+}*/
+//here we just create a function of type mathFunction and it already knows the expected input parameter types and the return type
+let multiply: mathFunction = function (c, d) {
+    return c * d;
+}
 
-function multiplicationTable (size: number): number[][] {
-    let multArr:number[][] = [];
-    for (let i = 0; i < size; i++) {
-        multArr.push([]);
-        for (let j = 0; j < size; j++) {
-            multArr[i].push((i + 1) * (j + 1));
-        }
+logMsg(multiply(2,3));
+
+// Optional Parameters
+//When using optional parameters you need to put in a type guard with typescript
+//optional parameters MUST be the last in the list of inputs
+const addAll = (a:number, b: number, c?: number): number => {
+    if(typeof c !== 'undefined') {//typeguard
+        return a + b + c;
     }
-    return multArr;
+    return a + b;
+}
+//Specifying a default param value for an input parameter avoids the need for a typeguard all together.
+const sumAll = (a:number = 9, b: number, c: number = 2): number => {
+    return a + b + c;
 }
 
-console.log(multiplicationTable(1));
-console.log(multiplicationTable(2));
-console.log(multiplicationTable(3));
+logMsg(addAll(2, 3 , 2));
+logMsg(addAll(2, 3));
+logMsg(sumAll(2, 3));
+//if you wanna utilize the default value for a in sumAll, you MUST pass in 'undefined' for a
+logMsg(sumAll(undefined, 2));
+//when defining a function type or interface, default values DO NOT work
 
-let commaSplit:RegExp = /[\w\s\.]*[^,]/g;
-let streetNumRegEx:RegExp = /^\d+/;
 
-let testStr: string = "54 Holy Grail Street Niagara Town ZP 32908,3200 Main Rd. Bern AE 56210,1 Gordon St. Atlanta RE 13000"
-let matchArr: (RegExpMatchArray);
-if(testStr.match(commaSplit)!=null){
-    matchArr = testStr.match(commaSplit);
-    console.log(matchArr);
-    console.log(streetNumRegEx.test(matchArr[1]));
-    console.log(matchArr[1].match(streetNumRegEx)[0]);
-    console.log(matchArr?matchArr.map((x: string) => x.match(streetNumRegEx)[0]):console.log("failed match"));
-
-}else{
-
+//Rest Parameters
+// Rest parameters are named that because they represent the rest of the parameters after specifically defined ones
+// rest parameter should come at the end of all of your parameters for a function
+const total = (a:number, ...nums: number[]):number => {
+    return a + nums.reduce((prev, curr) => prev + curr); //no need to specify prev or curr type or return type since in total function definition that has already been done
 }
 
+logMsg(total(1, 2, 3, 4));
 
+//never type
+//for functions that intentionally throw errors
+const createError = (errMsg: string): never =>{
+    throw new Error(errMsg);
+}
+//when mousing over function, if return type is never, MAKE SURE that the function is meant to throw an error.
+//Otherwise, you could have an endless loop inside of it like this:
+const infinite = () => {
+    let i: number = 1
+    while (true) {
+        i++;
+        //if (i > 100) break; //makes return type void
+    }
+}
+//defining a custom type guard so that you don't need to rewrite the same thing over and over again if one type guard is used often.
+const isNumber = (value: any): boolean =>{
+    return typeof value === 'number' ? true: false;
+}
+//Use of the never type
+const numberOrString = (value: number| string): string =>{
+    if(typeof value === 'string') return 'string';
+    if(isNumber(value)) return 'number';
+    return createError ('This should never happen'); //Allows for an undefined return to not exist by returning a never type instead
+}
