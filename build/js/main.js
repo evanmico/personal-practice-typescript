@@ -1,135 +1,85 @@
 "use strict";
-// The Redundant and Traditional class declaration
-// class Coder {
-//     //Properties and methods inside of a class are called members
-//     name: string; //(1) must have property exist in class as member
-//     music: string;
-//     age: number;
-//     lang: string;
-//     //you need a constructor when dealing with classes
-//     constructor(name: string, 
-//                 music: string, 
-//                 age: number, 
-//                 lang: string)
-//      {
-//         this.name = name; //(2) AND you must initialize the member in the constructor
-//         this.music = music;
-//         this.age = age;
-//         this.lang = lang;
-//     }
-// }
-//Visibility/Data/Access Modifiers method to avoid above redundancy
-class Coder {
-    //you need a constructor when dealing with classes
-    constructor(name, //public visibility mod allows not declaring member above, avoiding redundancy
-    music, age, //Can only be accessed within this class while protected can be accessed by derived classes
-    lang = 'Typescript' // " = 'Typescript' " means that a default value has been assigned so lang is not always necessary to be provided when creating a new instance of this class 
-    ) {
-        this.name = name;
-        this.music = music;
-        this.age = age;
-        this.lang = lang;
-        //Assignments in the constructor body ARE NOT required when visibility modifiers are used in params
-        /*
-        this.name = name; //(2) AND you must initialize the member in the constructor
-        this.music = music;
-        this.age = age;
-        this.lang = lang;
-        */
+//Index Signatures
+//used when you wanna access an object key, but you don't know the names of the keys
+const todaysTransactions = {
+    Pizza: -10,
+    Books: -5,
+    Job: 50,
+    Dave: 42 //added so undefined value won't be returned later
+};
+console.log(todaysTransactions.Pizza);
+console.log(todaysTransactions['Pizza']);
+let prop = 'Pizza';
+//TS REQUIRES an index signature when you try to access an object dynamically
+console.log(todaysTransactions[prop]); //this doesn't work in TS when index signatures aren't used for interface declaration
+const todaysNet = (transactions) => {
+    let total = 0;
+    for (const transaction in transactions) { //loops through all keys in transactions object, storing each one in transaction dynamically
+        total += transactions[transaction]; //Works when index signature is used in interface declaration
     }
-    getAge() {
-        return `Hello, I'm ${this.age}.`;
-    }
+    return total;
+};
+console.log(todaysNet(todaysTransactions));
+//todaysTransactions.Pizza = 40; //doesn't work cause we set readonly on transactionObj interface
+//If, generic index signature declaration interface is used, then This returns undefined because 'Dave' is not a key; however, TS doesn't know that so it will NOT throw an error, this is a drawback of this system.
+console.log(todaysTransactions['Dave']);
+const student = {
+    name: 'Ivan',
+    GPA: 3.1,
+    classes: [3000, 4000]
+};
+// console.log(student.test); //issue cause accessing key that doesn't exist
+/*Traditional JS method for looping through object keys
+for (const key in student) {
+    console.log(`${key}: ${student[key]}`); //Only works if index key is provided
 }
-const Ivan = new Coder('Ivan', 'Dubstep', 20); //Doesn't require 4th parameter because Coder class has default value available for 4th param
-console.log(Ivan.getAge()); //Works because we access public method to get age
-/* TS doesn't like this, but JS will be okay with this:
-console.log(Ivan.age); //Doesn't work because age is private and cannot be accessed from outside the class
-console.log(Ivan.lang); //Doesn't work because lang is protected and can ONLY be accessed by derived classes
 */
-class WebDev extends Coder {
-    constructor(computer, name, music, age) {
-        super(name, music, age); // In Derived Classes a call to super MUST be made for all members that are being brought in from parent class. This call must be made FIRST, before any assignment can happen.
-        this.computer = computer;
-        //this.computer = computer; // super must be called before this
-    }
-    getLang() {
-        return `I write ${this.lang}.`;
-    }
+//TS variation using assertions
+for (const key in student) {
+    //Assertion "as keyof Interface" creates a union type of string literals that contains all of the keys in the interface. (name, GPA, classes) 
+    console.log(`for loop TS variation\n${key}: ${student[key]}`); //Works regardless of an index key being provided
 }
-const Flavio = new WebDev('MacBook', 'Flavio', 'Alt', 21);
-console.log(Flavio.getLang()); //This method can be called to get language, in this case default language from parent class.
-//Verbose Way
-// class Pianist implements Musician {
-//     name: string;
-//     instrument: string;
-//     constructor(name: string, instrument: string) {
-//         this.name = name;
-//         this.instrument = instrument;
-//     }
-//     play(action: string) {
-//         return `${this.name} ${action} the ${this.instrument}`
-//     }
-// }
-//Dry Way of class implementing an interface
-class Pianist {
-    constructor(name, instrument = 'piano') {
-        this.name = name;
-        this.instrument = instrument;
-    }
-    ;
-    play(action) {
-        return `${this.name} ${action} the ${this.instrument}`;
-    }
+//Alternative TS way using map function
+Object.keys(student).map(key => {
+    console.log(`map TS variation\n${key}: ${student[key]}`); //typeof is used because we may not know what interface student is derived from so typeof student grabs the interface itself and does the same thing as earlier
+});
+//Alternative TS way using a function
+//This works because key has an "assertion" to be type "keyof Interface"
+//The result is that student and key can be referenced as normal JS because the type for key has already been defined.
+const logStudentKey = (student, key) => {
+    console.log(`Student ${key}: ${student[key]}`);
+};
+logStudentKey(student, 'GPA');
+//Created an object of type Incomes
+const monthlyIncomes = {
+    salary: 500,
+    bonus: 100,
+    sidehustle: 250
+};
+for (const revenue in monthlyIncomes) {
+    console.log(monthlyIncomes[revenue]);
 }
-const Rivas = new Pianist("Tomas Rivas");
-console.log(Rivas.play('plays'));
-//Static Members in classes
-class Peeps {
-    //This method is static so it can be called NO MATTER what by referencing the class itself directly
-    static getCount() {
-        return Peeps.count;
+const originNode = {
+    nextNode: undefined,
+    prevNode: undefined,
+    nodeData: 'Hello'
+};
+const createNode = (prevNode, data) => {
+    const newNode = {
+        prevNode: prevNode,
+        nextNode: prevNode.nextNode,
+        nodeData: data
+    };
+    if (prevNode.nextNode) {
+        prevNode.nextNode.prevNode = newNode;
     }
-    constructor(name) {
-        this.name = name;
-        this.id = ++Peeps.count; //Increments count first, then assigns it as an id for a particular instance
-    }
+    prevNode.nextNode = newNode;
+    return newNode;
+};
+const node1 = createNode(originNode, "My");
+const node2 = createNode(node1, 'Name');
+const node4 = createNode(node2, 'Ivan');
+const node3 = createNode(node2, 'Is');
+for (let node = originNode; node != undefined; node = node.nextNode) {
+    console.log(`${node.nodeData} `);
 }
-/*
-count applies DIRECTLY to the class, NOT a specific instance of said class
-This means that count will be accessible by referencing the class directly, rather than a specific instance of the class
-count will be the same between all instances of the class.
-*/
-Peeps.count = 0;
-const Max = new Peeps('Max');
-const Mark = new Peeps('Mark');
-const Yasha = new Peeps('Yasha');
-console.log(Peeps.count); //returns count of 3 because count is static between instances
-console.log(Mark.id); //id = 2 cause made second
-console.log(Max.id); //id = 1 cause made first
-//Getters and Setters
-class Artists {
-    constructor() {
-        this.dataState = [];
-    }
-    get data() {
-        return this.dataState;
-    }
-    set data(value) {
-        if (Array.isArray(value) && value.every(el => typeof el === 'string')) {
-            this.dataState = value;
-            return;
-        }
-        else
-            throw new Error('Param is not an array of strings');
-    }
-}
-const myArtists = new Artists();
-myArtists.data = ['Skrillex', 'Nero', 'Knife Party']; //when there is a setter, you just call .data and set equal to what you want
-console.log(myArtists.data); //When there is a getter, you can just do .data and the data will be returned
-myArtists.data = [...myArtists.data, 'Apashe']; //takes all the artists already in array and reassigns them using the rest operator, but also appends one more
-console.log(myArtists.data);
-/* Both throw error due to type guard we have put in place on setter
-myArtists.data = 'Britney';
-myArtists.data = ['Britney', 99];
-*/ 
